@@ -10,6 +10,20 @@ on:
         description: "The Play Store track to release to (internal, alpha, beta, production)"
         required: true
         type: string
+      push-changes:
+        description: 'Whether commit and push the created fastlane configuration'
+        required: false
+        default: false
+        type: boolean
+      git-user-name:
+        description: 'Required when push-changes is set, the git user.name'
+        required: false
+        type: string
+      git-user-email:
+        description: 'Required when push-changes is set, the git user.email'
+        required: false
+        type: string
+    secrets:
       keystore:
         description: 'Base64 encoded Android keystore'
         required: true
@@ -29,19 +43,6 @@ on:
       play-store-creds:
         description: 'Your Play Store credentials'
         required: true
-        type: string
-      push-changes:
-        description: 'Whether commit and push the created fastlane configuration'
-        required: false
-        default: false
-        type: boolean
-      git-user-name:
-        description: 'Required when push-changes is set, the git user.name'
-        required: false
-        type: string
-      git-user-email:
-        description: 'Required when push-changes is set, the git user.email'
-        required: false
         type: string
 
 jobs:
@@ -67,6 +68,12 @@ jobs:
           SECRETS_DIR=/secrets
           JSON_KEY_FILE=$SECRETS_DIR/play-store-credentials.json
           KEYSTORE_FILE=$SECRETS_DIR/keystore.jks
+
+          PACKAGE_NAME=${{ inputs.package-name }}
+          TRACK=${{ inputs.track }}
+          KEY_PASSWORD=${{ secrets.key-password }}
+          KEY_ALIAS=${{ secrets.key-alilas }}
+          KEYSTORE_PASSWORD=${{ secrets.keystore-password }}
 
           cd $PROJECT_ROOT
 
@@ -94,9 +101,9 @@ jobs:
           if [[ ! -f "Appfile" ]]; then
               echo "Creating Appfile"
               touch $FASTLANEDIR/Appfile
-              echo "$PLAY_STORE_CREDS" > $JSON_KEY_FILE
+              echo "${{ secrets.play-store-creds }}" > $JSON_KEY_FILE
               echo 'json_key_file("'$JSON_KEY_FILE'")' >> $FASTLANEDIR/Appfile
-              echo 'package_name("'$PACKAGE_NAME'")' >> $FASTLANEDIR/Appfile
+              echo 'package_name("${{ secrets.package_name }}")' >> $FASTLANEDIR/Appfile
           else
               echo "Appfile already exists; not taking any action"
           fi
@@ -118,7 +125,7 @@ jobs:
           echo "Running Bundler"
           bundle install
 
-          echo "$KEYSTORE_ENCODED" | base64 --decode > $KEYSTORE_FILE
+          echo "${{ secrets.keystore }}" | base64 --decode > $KEYSTORE_FILE
 
           # Run fastlane
           bundle exec fastlane android deploy
@@ -127,9 +134,9 @@ jobs:
           rm -r $SECRETS_DIR
 
           # Commit and push specific changes
-          if [[ $PUSH_CHANGES ]]; then
-              git config --global user.name $GIT_USER_NAME
-              git config --global user.email $GIT_USER_EMAIL
+          if [[ ${{ inputs.push-changes }} ]]; then
+              git config --global user.name ${{ inputs.git-user-name }}
+              git config --global user.email ${{ inputs.git-user-email }}
               # TODO do we care which branch we're on?
               # TODO do we want to commit Gemfile.lock?
               git add $PROJECT_ROOT/Gemfile
