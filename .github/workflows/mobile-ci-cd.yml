@@ -1,0 +1,142 @@
+name: Android CI/CD
+on:
+  workflow_call:
+    inputs:
+      package-name:
+        description: "The Android package name from the app manifest"
+        required: true
+        type: string
+      track:
+        description: "The Play Store track to release to (internal, alpha, beta, production)"
+        required: true
+        type: string
+      keystore:
+        description: 'Base64 encoded Android keystore'
+        required: true
+        type: string
+      keystore-password:
+        description: "The keystore password"
+        required: true
+        type: string
+      key-alias:
+        description: "The alias of the signing key"
+        required: true
+        type: string
+      key-password:
+        description: "The password of the signing key"
+        required: true
+        type: string
+      play-store-creds:
+        description: 'Your Play Store credentials'
+        required: true
+        type: string
+      push-changes:
+        description: 'Whether commit and push the created fastlane configuration'
+        required: false
+        default: false
+        type: boolean
+      git-user-name:
+        description: 'Required when push-changes is set, the git user.name'
+        required: false
+        type: string
+      git-user-email:
+        description: 'Required when push-changes is set, the git user.email'
+        required: false
+        type: string
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    name: Build & ship the app
+    steps:
+      - name: Set up Java
+        uses: actions/setup-java@v1
+        with:
+          java-version: 1.8
+      - uses: actions/checkout@v2
+        env:
+          MOBILE_CI_CD_DIR: mobile-ci-cd
+        with:
+          path: ${{ env.MOBILE_CI_CD_DIR }}
+      - name: Bundle install
+        run: sudo gem install bundler && bundle install
+      - name: Do the work
+        run: |
+          PROJECT_ROOT=$GITHUB_WORKSPACE
+          FASTLANEDIR=$PROJECT_ROOT/fastlane
+          SECRETS_DIR=/secrets
+          JSON_KEY_FILE=$SECRETS_DIR/play-store-credentials.json
+          KEYSTORE_FILE=$SECRETS_DIR/keystore.jks
+
+          cd $PROJECT_ROOT
+
+          mkdir $SECRETS_DIR
+
+          if [[ ! -f "Gemfile" ]]; then
+              echo "Copying Gemfile"
+              cp ./$MOBILE_CD_CD_DIR/Gemfile Gemfile
+          else
+              # Add fastlane to the exising gemfile if it isn't referenced (including as a dependency)
+              if ! bundle list | grep 'fastlane'; then
+                  bundle add fastlane
+              else
+                  echo "Gemfile already exists and already references fastlane; not taking any action"
+              fi
+          fi
+
+          if [[ ! -d "$FASTLANEDIR" ]]; then
+              echo "Creating $FASTLANEDIR dir"
+              mkdir $FASTLANEDIR
+          else
+              echo "$FASTLANEDIR directory already exists"
+          fi
+
+          if [[ ! -f "Appfile" ]]; then
+              echo "Creating Appfile"
+              touch $FASTLANEDIR/Appfile
+              echo "$PLAY_STORE_CREDS" > $JSON_KEY_FILE
+              echo 'json_key_file("'$JSON_KEY_FILE'")' >> $FASTLANEDIR/Appfile
+              echo 'package_name("'$PACKAGE_NAME'")' >> $FASTLANEDIR/Appfile
+          else
+              echo "Appfile already exists; not taking any action"
+          fi
+
+          if [[ ! -f "Fastfile" ]]; then
+              echo "Copying Fastfile"
+              cp /$MOBILE_CI_CD_DIR/Fastfile $FASTLANEDIR/Fastfile
+          else
+              echo "Fastfile already exists; not taking any action"
+          fi
+
+          if [[ ! -f "Pluginfile" ]]; then
+              echo "Copying Pluginfile"
+              cp /$MOBILE_CI_CD_DIR/Pluginfile $FASTLANEDIR/Pluginfile
+          else
+              echo "Pluginfile already exists; TODO add the plugin we need if it isn't in there"
+          fi
+
+          echo "Running Bundler"
+          bundle install
+
+          echo "$KEYSTORE_ENCODED" | base64 --decode > $KEYSTORE_FILE
+
+          # Run fastlane
+          bundle exec fastlane android deploy
+
+          # TODO always clean up, also in case of failure
+          rm -r $SECRETS_DIR
+
+          # Commit and push specific changes
+          if [[ $PUSH_CHANGES ]]; then
+              git config --global user.name $GIT_USER_NAME
+              git config --global user.email $GIT_USER_EMAIL
+              # TODO do we care which branch we're on?
+              # TODO do we want to commit Gemfile.lock?
+              git add $PROJECT_ROOT/Gemfile
+              git add $FASTLANEDIR/Appfile
+              git add $FASTLANEDIR/Fastfile
+              git add $FASTLANEDIR/Pluginfile
+              git commit -m "Configure fastlane"
+              # TODO We probably don't have the right to push...
+          fi
+
