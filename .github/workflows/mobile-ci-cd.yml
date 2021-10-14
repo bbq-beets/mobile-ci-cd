@@ -68,8 +68,11 @@ jobs:
         run: |
           PROJECT_ROOT=$GITHUB_WORKSPACE/$PROJECT_ROOT
           MOBILE_CI_CD_DIR=$GITHUB_WORKSPACE/$MOBILE_CI_CD_DIR
+          echo "We're now here:"
           pwd
+          echo "Now going to $PROJECT_ROOT"
           cd $PROJECT_ROOT
+          echo "What's here?"
           ls
           sudo gem install bundler && bundle install
       - name: Do the work
