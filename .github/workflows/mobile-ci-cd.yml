@@ -65,18 +65,16 @@ jobs:
           token: ${{ secrets.GITHUB_TOKEN }}
       - name: Install required software
         run: |
-          echo "MOBILE_CI_CD_DIR: $MOBILE_CI_CD_DIR"
           cd $PROJECT_ROOT
           sudo gem install bundler
       - name: Create required files
         run: |
-          echo "MOBILE_CI_CD_DIR: $MOBILE_CI_CD_DIR"
           cd $PROJECT_ROOT
           FASTLANEDIR=$PROJECT_ROOT/fastlane
 
           if [[ ! -f "Gemfile" ]]; then
               echo "Copying Gemfile"
-              cp ./$MOBILE_CD_CD_DIR/Gemfile Gemfile
+              cp $MOBILE_CD_CD_DIR/Gemfile Gemfile
           else
               # Add fastlane to the exising gemfile if it isn't referenced (including as a dependency)
               if ! bundle list | grep 'fastlane'; then
@@ -106,14 +104,14 @@ jobs:
 
           if [[ ! -f "Fastfile" ]]; then
               echo "Copying Fastfile"
-              cp /$MOBILE_CI_CD_DIR/Fastfile Fastfile
+              cp $MOBILE_CI_CD_DIR/Fastfile Fastfile
           else
               echo "Fastfile already exists; not taking any action"
           fi
 
           if [[ ! -f "Pluginfile" ]]; then
               echo "Copying Pluginfile"
-              cp /$MOBILE_CI_CD_DIR/Pluginfile Pluginfile
+              cp $MOBILE_CI_CD_DIR/Pluginfile Pluginfile
           else
               echo "Pluginfile already exists; TODO add the plugin we need if it isn't in there"
           fi
