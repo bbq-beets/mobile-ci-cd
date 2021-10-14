@@ -135,7 +135,7 @@ jobs:
           echo "${{ secrets.keystore }}" | base64 --decode > $KEYSTORE_FILE
 
           echo "Getting fingerprint"
-          keytool -list -v -alias key0 -keystore app/octogame.jks
+          keytool -list -v -alias key0 -keystore $KEYSTORE_FILE
 
           echo "Storing play store credentials"
           echo "${{ secrets.play-store-creds }}" > $JSON_KEY_FILE
