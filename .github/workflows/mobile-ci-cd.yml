@@ -69,7 +69,7 @@ jobs:
           PROJECT_ROOT=$GITHUB_WORKSPACE/$PROJECT_ROOT
           MOBILE_CI_CD_DIR=$GITHUB_WORKSPACE/$MOBILE_CI_CD_DIR
           pwd
-          cd PROJECT_ROOT
+          cd $PROJECT_ROOT
           ls
           sudo gem install bundler && bundle install
       - name: Do the work
