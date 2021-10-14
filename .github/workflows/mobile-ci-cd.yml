@@ -116,14 +116,14 @@ jobs:
       - name: Do the work
         run: |
           SECRETS_DIR=$GITHUB_WORKSPACE/secrets
-          JSON_KEY_FILE=$SECRETS_DIR/play-store-credentials.json
+          export JSON_KEY_FILE=$SECRETS_DIR/play-store-credentials.json
           export KEYSTORE_FILE=$SECRETS_DIR/keystore.jks
 
-          PACKAGE_NAME=${{ inputs.package-name }}
-          TRACK=${{ inputs.track }}
-          KEY_PASSWORD=${{ secrets.key-password }}
-          KEY_ALIAS=${{ secrets.key-alilas }}
-          KEYSTORE_PASSWORD=${{ secrets.keystore-password }}
+          export PACKAGE_NAME=${{ inputs.package-name }}
+          export TRACK=${{ inputs.track }}
+          export KEY_PASSWORD=${{ secrets.key-password }}
+          export KEY_ALIAS=${{ secrets.key-alilas }}
+          export KEYSTORE_PASSWORD=${{ secrets.keystore-password }}
 
           cd $PROJECT_ROOT
 
