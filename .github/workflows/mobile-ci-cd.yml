@@ -117,7 +117,7 @@ jobs:
         run: |
           SECRETS_DIR=$GITHUB_WORKSPACE/secrets
           JSON_KEY_FILE=$SECRETS_DIR/play-store-credentials.json
-          KEYSTORE_FILE=$SECRETS_DIR/keystore.jks
+          export KEYSTORE_FILE=$SECRETS_DIR/keystore.jks
 
           PACKAGE_NAME=${{ inputs.package-name }}
           TRACK=${{ inputs.track }}
