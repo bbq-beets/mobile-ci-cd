@@ -55,14 +55,12 @@ jobs:
       - name: Check out Mobile CI/CD
         uses: actions/checkout@v2
         with:
+          repository: bbq-beets/mobile-ci-cd
           path: ${{ env.MOBILE_CI_CD_DIR }}
       - name: Check out caller repository
         uses: actions/checkout@v2
         with:
-          #TODO ${{ inputs.repository }} or can we grab this from some environment variable?
-          repository: bbq-beets/octo-game
           path: ${{ env.PROJECT_ROOT }}
-          token: ${{ secrets.GITHUB_TOKEN }}
       - name: Install required software
         run: |
           cd $PROJECT_ROOT
