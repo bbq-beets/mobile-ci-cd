@@ -61,7 +61,7 @@ jobs:
           PROJECT_ROOT: caller-repo
         with:
           #TODO ${{ inputs.repository }} or can we grab this from some environment variable?
-          repo: bbq-beets/octo-game
+          repository: bbq-beets/octo-game
           path: ${{ env.PROJECT_ROOT }}
           token: ${{ env.GITHUB_TOKEN }}
       - name: Bundle install
