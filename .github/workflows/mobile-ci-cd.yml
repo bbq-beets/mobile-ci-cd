@@ -49,19 +49,31 @@ jobs:
         uses: actions/setup-java@v1
         with:
           java-version: 1.8
-      - uses: actions/checkout@v2
+      - name: Check out Mobile CI/CD
+        uses: actions/checkout@v2
         env:
           MOBILE_CI_CD_DIR: mobile-ci-cd
         with:
           path: ${{ env.MOBILE_CI_CD_DIR }}
+      - name: Check out caller repository
+        uses: actions/checkout@v2
+        env:
+          PROJECT_ROOT: caller-repo
+        with:
+          #TODO ${{ inputs.repository }} or can we grab this from some environment variable?
+          repo: bbq-beets/octo-game
+          path: ${{ env.PROJECT_ROOT }}
+          token: ${{ env.GITHUB_TOKEN }}
       - name: Bundle install
         run: |
+          PROJECT_ROOT=$GITHUB_WORKSPACE/$PROJECT_ROOT
+          MOBILE_CI_CD_DIR=$GITHUB_WORKSPACE/$MOBILE_CI_CD_DIR
           pwd
+          cd PROJECT_ROOT
           ls
           sudo gem install bundler && bundle install
       - name: Do the work
         run: |
-          PROJECT_ROOT=$GITHUB_WORKSPACE
           FASTLANEDIR=$PROJECT_ROOT/fastlane
           SECRETS_DIR=/secrets
           JSON_KEY_FILE=$SECRETS_DIR/play-store-credentials.json
