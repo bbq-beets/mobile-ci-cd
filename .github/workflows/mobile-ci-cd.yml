@@ -45,7 +45,7 @@ jobs:
     runs-on: ubuntu-latest
     name: Build & ship the app
     env:
-      MOBILE_CI_CD_DIR: $GITHUB_WORKSPACE/mobile-ci-cd
+      MOBILE_CI_CD_DIR: ${{ github.WORKSPACE }}mobile-ci-cd
       PROJECT_ROOT: caller-repo
     steps:
       - name: Set up Java
