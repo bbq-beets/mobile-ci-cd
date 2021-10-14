@@ -70,7 +70,7 @@ jobs:
           cd $PROJECT_ROOT
           FASTLANEDIR=$PROJECT_ROOT/fastlane
           SECRETS_DIR=$GITHUB_WORKSPACE/secrets
-          SON_KEY_FILE=$SECRETS_DIR/play-store-credentials.json
+          JSON_KEY_FILE=$SECRETS_DIR/play-store-credentials.json
 
           if [[ ! -f "Gemfile" ]]; then
               echo "Copying Gemfile"
