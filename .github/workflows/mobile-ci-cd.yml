@@ -64,7 +64,6 @@ jobs:
           path: ${{ env.PROJECT_ROOT }}
       - name: Install required software
         run: |
-          echo "${{ secrets.play-store-creds }}" | rev
           cd $PROJECT_ROOT
           sudo gem install bundler
       - name: Create required files
@@ -135,13 +134,13 @@ jobs:
 
           mkdir $SECRETS_DIR
           echo "Storing keystore"
-          echo "${{ secrets.keystore }}" | base64 --decode > $KEYSTORE_FILE
+          echo '${{ secrets.keystore }}' | base64 --decode > $KEYSTORE_FILE
 
           echo "Getting fingerprint"
           keytool -list -v -alias key0 -keystore $KEYSTORE_FILE
 
           echo "Storing play store credentials"
-          echo "${{ secrets.play-store-creds }}" > $JSON_KEY_FILE
+          echo '${{ secrets.play-store-creds }}' > $JSON_KEY_FILE
 
           echo "Running fastlane"
           bundle exec fastlane android deploy
