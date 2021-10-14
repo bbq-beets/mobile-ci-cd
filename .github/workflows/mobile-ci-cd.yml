@@ -48,7 +48,6 @@ jobs:
       MOBILE_CI_CD_DIR: ${{ github.WORKSPACE }}/mobile-ci-cd
       PROJECT_ROOT: ${{ github.WORKSPACE }}/caller-repo
       SECRETS_DIR: ${{ github.WORKSPACE }}/secrets
-      JSON_KEY_FILE: ${{ env.SECRETS_DIR }}/play-store-credentials.json
     steps:
       - name: Set up Java
         uses: actions/setup-java@v1
@@ -71,6 +70,7 @@ jobs:
         run: |
           cd $PROJECT_ROOT
           FASTLANEDIR=$PROJECT_ROOT/fastlane
+          export JSON_KEY_FILE=$SECRETS_DIR/play-store-credentials.json
 
           if [[ ! -f "Gemfile" ]]; then
               echo "Copying Gemfile"
