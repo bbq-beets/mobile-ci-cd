@@ -63,33 +63,16 @@ jobs:
           repository: bbq-beets/octo-game
           path: ${{ env.PROJECT_ROOT }}
           token: ${{ secrets.GITHUB_TOKEN }}
-      - name: Bundle install
+      - name: Install required software
         run: |
           PROJECT_ROOT=$GITHUB_WORKSPACE/$PROJECT_ROOT
           MOBILE_CI_CD_DIR=$GITHUB_WORKSPACE/$MOBILE_CI_CD_DIR
-          echo "We're now here:"
-          pwd
-          echo "Now going to $PROJECT_ROOT"
           cd $PROJECT_ROOT
-          echo "What's here?"
-          ls
-          sudo gem install bundler && bundle install
-      - name: Do the work
+          sudo gem install bundler
+      - name: Create required files
         run: |
-          FASTLANEDIR=$PROJECT_ROOT/fastlane
-          SECRETS_DIR=/secrets
-          JSON_KEY_FILE=$SECRETS_DIR/play-store-credentials.json
-          KEYSTORE_FILE=$SECRETS_DIR/keystore.jks
-
-          PACKAGE_NAME=${{ inputs.package-name }}
-          TRACK=${{ inputs.track }}
-          KEY_PASSWORD=${{ secrets.key-password }}
-          KEY_ALIAS=${{ secrets.key-alilas }}
-          KEYSTORE_PASSWORD=${{ secrets.keystore-password }}
-
           cd $PROJECT_ROOT
-
-          mkdir $SECRETS_DIR
+          FASTLANEDIR=$PROJECT_ROOT/fastlane
 
           if [[ ! -f "Gemfile" ]]; then
               echo "Copying Gemfile"
@@ -110,36 +93,55 @@ jobs:
               echo "$FASTLANEDIR directory already exists"
           fi
 
+          cd $FASTLANEDIR
+
           if [[ ! -f "Appfile" ]]; then
               echo "Creating Appfile"
-              touch $FASTLANEDIR/Appfile
-              echo "${{ secrets.play-store-creds }}" > $JSON_KEY_FILE
-              echo 'json_key_file("'$JSON_KEY_FILE'")' >> $FASTLANEDIR/Appfile
-              echo 'package_name("${{ secrets.package_name }}")' >> $FASTLANEDIR/Appfile
+              touch Appfile
+              echo 'json_key_file("'$JSON_KEY_FILE'")' >> Appfile
+              echo 'package_name("${{ secrets.package_name }}")' >> Appfile
           else
               echo "Appfile already exists; not taking any action"
           fi
 
           if [[ ! -f "Fastfile" ]]; then
               echo "Copying Fastfile"
-              cp /$MOBILE_CI_CD_DIR/Fastfile $FASTLANEDIR/Fastfile
+              cp /$MOBILE_CI_CD_DIR/Fastfile Fastfile
           else
               echo "Fastfile already exists; not taking any action"
           fi
 
           if [[ ! -f "Pluginfile" ]]; then
               echo "Copying Pluginfile"
-              cp /$MOBILE_CI_CD_DIR/Pluginfile $FASTLANEDIR/Pluginfile
+              cp /$MOBILE_CI_CD_DIR/Pluginfile Pluginfile
           else
               echo "Pluginfile already exists; TODO add the plugin we need if it isn't in there"
           fi
+      - name: Do the work
+        run: |
+          SECRETS_DIR=$GITHUB_WORKSPACE/secrets
+          JSON_KEY_FILE=$SECRETS_DIR/play-store-credentials.json
+          KEYSTORE_FILE=$SECRETS_DIR/keystore.jks
+
+          PACKAGE_NAME=${{ inputs.package-name }}
+          TRACK=${{ inputs.track }}
+          KEY_PASSWORD=${{ secrets.key-password }}
+          KEY_ALIAS=${{ secrets.key-alilas }}
+          KEYSTORE_PASSWORD=${{ secrets.keystore-password }}
+
+          cd $PROJECT_ROOT
 
           echo "Running Bundler"
           bundle install
 
+          mkdir $SECRETS_DIR
+          echo "Storing keystore"
           echo "${{ secrets.keystore }}" | base64 --decode > $KEYSTORE_FILE
 
-          # Run fastlane
+          echo "Storing play store credentials"
+          echo "${{ secrets.play-store-creds }}" > $JSON_KEY_FILE
+
+          echo "Running fastlane"
           bundle exec fastlane android deploy
 
           # TODO always clean up, also in case of failure
