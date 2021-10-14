@@ -74,7 +74,7 @@ jobs:
 
           if [[ ! -f "Gemfile" ]]; then
               echo "Copying Gemfile"
-              cp $MOBILE_CD_CD_DIR/Gemfile Gemfile
+              cp $MOBILE_CI_CD_DIR/Gemfile Gemfile
           else
               # Add fastlane to the exising gemfile if it isn't referenced (including as a dependency)
               if ! bundle list | grep 'fastlane'; then
