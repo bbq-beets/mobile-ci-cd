@@ -56,9 +56,9 @@ jobs:
           path: ${{ env.MOBILE_CI_CD_DIR }}
       - name: Bundle install
         run: |
-        pwd
-        ls
-        sudo gem install bundler && bundle install
+          pwd
+          ls
+          sudo gem install bundler && bundle install
       - name: Do the work
         run: |
           PROJECT_ROOT=$GITHUB_WORKSPACE
