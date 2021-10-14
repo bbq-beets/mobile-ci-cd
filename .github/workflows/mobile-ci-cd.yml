@@ -122,7 +122,7 @@ jobs:
           export PACKAGE_NAME=${{ inputs.package-name }}
           export TRACK=${{ inputs.track }}
           export KEY_PASSWORD=${{ secrets.key-password }}
-          export KEY_ALIAS=${{ secrets.key-alilas }}
+          export KEY_ALIAS=${{ secrets.key-alias }}
           export KEYSTORE_PASSWORD=${{ secrets.keystore-password }}
 
           cd $PROJECT_ROOT
