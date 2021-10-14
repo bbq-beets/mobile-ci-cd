@@ -63,7 +63,7 @@ jobs:
           #TODO ${{ inputs.repository }} or can we grab this from some environment variable?
           repository: bbq-beets/octo-game
           path: ${{ env.PROJECT_ROOT }}
-          token: ${{ env.GITHUB_TOKEN }}
+          token: ${{ secrets.GITHUB_TOKEN }}
       - name: Bundle install
         run: |
           PROJECT_ROOT=$GITHUB_WORKSPACE/$PROJECT_ROOT
