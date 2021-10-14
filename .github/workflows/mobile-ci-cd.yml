@@ -48,6 +48,7 @@ jobs:
       MOBILE_CI_CD_DIR: ${{ github.WORKSPACE }}/mobile-ci-cd
       PROJECT_ROOT: ${{ github.WORKSPACE }}/caller-repo
       SECRETS_DIR: ${{ github.WORKSPACE }}/secrets
+      JSON_KEY_FILE: ${{ github.WORKSPACE }}/secrets/play-store-credentials.json
     steps:
       - name: Set up Java
         uses: actions/setup-java@v1
@@ -67,11 +68,12 @@ jobs:
           cd $PROJECT_ROOT
           sudo gem install bundler
       - name: Create required files
+        env:
+          JSON_KEY_FILE: ${{ env.SECRETS_DIR }}/play-store-credentials.json
+          FASTLANEDIR: ${{ env.PROJECT_ROOT }}/fastlane
         run: |
           cd $PROJECT_ROOT
-          FASTLANEDIR=$PROJECT_ROOT/fastlane
-          JSON_KEY_FILE=$SECRETS_DIR/play-store-credentials.json
-
+          
           if [[ ! -f "Gemfile" ]]; then
               echo "Copying Gemfile"
               cp $MOBILE_CI_CD_DIR/Gemfile Gemfile
@@ -116,17 +118,15 @@ jobs:
               echo "Pluginfile already exists; TODO add the plugin we need if it isn't in there"
           fi
       - name: Call fastlane
-        run: |
-          # TODO repeated above
-          JSON_KEY_FILE=$SECRETS_DIR/play-store-credentials.json
-
-          export KEYSTORE_FILE=$SECRETS_DIR/keystore.jks
-          export PACKAGE_NAME=${{ inputs.package-name }}
-          export TRACK=${{ inputs.track }}
-          export KEY_PASSWORD=${{ secrets.key-password }}
-          export KEY_ALIAS=${{ secrets.key-alias }}
-          export KEYSTORE_PASSWORD=${{ secrets.keystore-password }}
-
+        env:
+          JSON_KEY_FILE: ${{ env.SECRETS_DIR }}/play-store-credentials.json
+          KEYSTORE_FILE: ${{ env.SECRETS_DIR }}/keystore.jks
+          PACKAGE_NAME: ${{ inputs.package-name }}
+          TRACK: ${{ inputs.track }}
+          KEY_PASSWORD: ${{ secrets.key-password }}
+          KEY_ALIAS: ${{ secrets.key-alias }}
+          KEYSTORE_PASSWORD: ${{ secrets.keystore-password }}
+        run: |       
           cd $PROJECT_ROOT
 
           echo "Running Bundler"
@@ -144,10 +144,14 @@ jobs:
 
           echo "Running fastlane"
           bundle exec fastlane android deploy
-
+          
+      - name: Clean up
+        run: |
           # TODO always clean up, also in case of failure
           rm -r $SECRETS_DIR
-
+          
+      - name: Commit the changes
+        run: |
           # Commit and push specific changes
           if [[ ${{ inputs.push-changes }} ]]; then
               git config --global user.name ${{ inputs.git-user-name }}
