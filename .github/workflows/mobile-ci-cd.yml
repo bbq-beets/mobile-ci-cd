@@ -27,23 +27,18 @@ on:
       keystore:
         description: 'Base64 encoded Android keystore'
         required: true
-        type: string
       keystore-password:
         description: "The keystore password"
         required: true
-        type: string
       key-alias:
         description: "The alias of the signing key"
         required: true
-        type: string
       key-password:
         description: "The password of the signing key"
         required: true
-        type: string
       play-store-creds:
         description: 'Your Play Store credentials'
         required: true
-        type: string
 
 jobs:
   deploy:
