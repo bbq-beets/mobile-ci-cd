@@ -70,7 +70,7 @@ jobs:
         run: |
           cd $PROJECT_ROOT
           FASTLANEDIR=$PROJECT_ROOT/fastlane
-          export JSON_KEY_FILE=$SECRETS_DIR/play-store-credentials.json
+          JSON_KEY_FILE=$SECRETS_DIR/play-store-credentials.json
 
           if [[ ! -f "Gemfile" ]]; then
               echo "Copying Gemfile"
@@ -117,6 +117,9 @@ jobs:
           fi
       - name: Call fastlane
         run: |
+          # TODO repeated above
+          JSON_KEY_FILE=$SECRETS_DIR/play-store-credentials.json
+
           export KEYSTORE_FILE=$SECRETS_DIR/keystore.jks
           export PACKAGE_NAME=${{ inputs.package-name }}
           export TRACK=${{ inputs.track }}
