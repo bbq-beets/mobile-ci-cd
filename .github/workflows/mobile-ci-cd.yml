@@ -69,6 +69,8 @@ jobs:
         run: |
           cd $PROJECT_ROOT
           FASTLANEDIR=$PROJECT_ROOT/fastlane
+          SECRETS_DIR=$GITHUB_WORKSPACE/secrets
+          SON_KEY_FILE=$SECRETS_DIR/play-store-credentials.json
 
           if [[ ! -f "Gemfile" ]]; then
               echo "Copying Gemfile"
@@ -113,12 +115,9 @@ jobs:
           else
               echo "Pluginfile already exists; TODO add the plugin we need if it isn't in there"
           fi
-      - name: Do the work
+      - name: Call fastlane
         run: |
-          SECRETS_DIR=$GITHUB_WORKSPACE/secrets
-          export JSON_KEY_FILE=$SECRETS_DIR/play-store-credentials.json
           export KEYSTORE_FILE=$SECRETS_DIR/keystore.jks
-
           export PACKAGE_NAME=${{ inputs.package-name }}
           export TRACK=${{ inputs.track }}
           export KEY_PASSWORD=${{ secrets.key-password }}
