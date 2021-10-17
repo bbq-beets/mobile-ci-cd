@@ -49,19 +49,19 @@ jobs:
       PROJECT_ROOT: ${{ github.WORKSPACE }}/caller-repo
       SECRETS_DIR: ${{ github.WORKSPACE }}/secrets
     steps:
-      - name: Set up Java
-        uses: actions/setup-java@v1
+      - name: Check out caller repository
+        uses: actions/checkout@v2
         with:
-          java-version: 1.8
+          path: ${{ env.PROJECT_ROOT }}
       - name: Check out Mobile CI/CD
         uses: actions/checkout@v2
         with:
           repository: bbq-beets/mobile-ci-cd
           path: ${{ env.MOBILE_CI_CD_DIR }}
-      - name: Check out caller repository
-        uses: actions/checkout@v2
+      - name: Set up Java
+        uses: actions/setup-java@v1
         with:
-          path: ${{ env.PROJECT_ROOT }}
+          java-version: 1.8
       - name: Install required software
         run: |
           cd $PROJECT_ROOT
