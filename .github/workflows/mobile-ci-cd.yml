@@ -119,6 +119,7 @@ jobs:
         run: |
           # TODO repeated above
           JSON_KEY_FILE=$SECRETS_DIR/play-store-credentials.json
+          FASTLANEDIR=$PROJECT_ROOT/fastlane
 
           export KEYSTORE_FILE=$SECRETS_DIR/keystore.jks
           export PACKAGE_NAME=${{ inputs.package-name }}
