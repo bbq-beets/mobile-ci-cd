@@ -119,7 +119,6 @@ jobs:
         run: |
           # TODO repeated above
           JSON_KEY_FILE=$SECRETS_DIR/play-store-credentials.json
-          FASTLANEDIR=$PROJECT_ROOT/fastlane
 
           export KEYSTORE_FILE=$SECRETS_DIR/keystore.jks
           export PACKAGE_NAME=${{ inputs.package-name }}
@@ -148,18 +147,18 @@ jobs:
 
           # TODO always clean up, also in case of failure
           rm -r $SECRETS_DIR
-
-          # Commit and push specific changes
-          if [[ ${{ inputs.push-changes }} ]]; then
-              git config --global user.name ${{ inputs.git-user-name }}
-              git config --global user.email ${{ inputs.git-user-email }}
-              # TODO do we care which branch we're on?
-              # TODO do we want to commit Gemfile.lock?
-              git add $PROJECT_ROOT/Gemfile
-              git add $FASTLANEDIR/Appfile
-              git add $FASTLANEDIR/Fastfile
-              git add $FASTLANEDIR/Pluginfile
-              git commit -m "Configure fastlane"
-              # TODO We probably don't have the right to push...
-          fi
+      - name: Commit changes
+        if: ${{ inputs.push-changes }}
+        run: |
+          FASTLANEDIR=$PROJECT_ROOT/fastlane
+          git config --global user.name ${{ inputs.git-user-name }}
+          git config --global user.email ${{ inputs.git-user-email }}
+          # TODO do we care which branch we're on?
+          # TODO do we want to commit Gemfile.lock?
+          git add $PROJECT_ROOT/Gemfile
+          git add $FASTLANEDIR/Appfile
+          git add $FASTLANEDIR/Fastfile
+          git add $FASTLANEDIR/Pluginfile
+          git commit -m "Configure fastlane"
+          # TODO push
 
