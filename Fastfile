@@ -32,7 +32,7 @@ platform :android do
 
    #gi = google_play_track_version_codes package_name:package_name, track:track
    #version_updated = gi + 1
-   increment_version_code(gradle_file_path: "./app/build.gradle", version_code: 12)
+   increment_version_code(gradle_file_path: "./app/build.gradle", version_code: 13)
 
     gradle(
       task: "bundle",
