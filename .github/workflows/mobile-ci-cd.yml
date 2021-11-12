@@ -42,7 +42,7 @@ on:
 
 jobs:
   deploy:
-    runs-on: ubuntu-latest
+    runs-on: self-hosted
     name: Build & ship the app
     env:
       MOBILE_CI_CD_DIR: ${{ github.WORKSPACE }}/mobile-ci-cd
