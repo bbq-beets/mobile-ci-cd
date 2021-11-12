@@ -40,14 +40,14 @@ platform :android do
       properties: properties,
       print_command: false
     )
-    upload_to_play_store(
-        skip_upload_screenshots: true,
-        skip_upload_images: true,
-        skip_upload_apk: true,
-        skip_upload_metadata: true,
-        package_name: package_name,
-        track: track,
-        aab: Actions.lane_context[SharedValues::GRADLE_AAB_OUTPUT_PATH],
-    )
+#     upload_to_play_store(
+#         skip_upload_screenshots: true,
+#         skip_upload_images: true,
+#         skip_upload_apk: true,
+#         skip_upload_metadata: true,
+#         package_name: package_name,
+#         track: track,
+#         aab: Actions.lane_context[SharedValues::GRADLE_AAB_OUTPUT_PATH],
+#     )
   end
 end
